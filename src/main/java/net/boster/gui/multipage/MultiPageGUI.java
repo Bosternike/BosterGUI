@@ -60,6 +60,10 @@ public class MultiPageGUI implements GUI {
         return creator.getSize();
     }
 
+    public void setTitle(@Nullable String title) {
+        creator.setTitle(title);
+    }
+
     public @Nullable String getTitle() {
         return creator.getTitle();
     }
