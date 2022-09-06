@@ -14,6 +14,7 @@
     <groupId>com.github.Bosternike</groupId>
     <artifactId>BosterGUI</artifactId>
     <version>1.0.1</version>
+    <scope>compile</scope>
 </dependency>
 ```
 
