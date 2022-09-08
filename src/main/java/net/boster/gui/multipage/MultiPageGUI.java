@@ -44,6 +44,8 @@ public class MultiPageGUI implements GUI {
     @Getter @Setter @NotNull private List<MultiPageFunctionalEntry> items = new ArrayList<>();
     @Getter @Setter @NotNull private Map<Integer, MultiPageFunctionalEntry> currentItems = new LinkedHashMap<>();
 
+    @Getter @Setter @NotNull private Map<String, Object> data = new HashMap<>();
+
     public boolean accessPlayerInventory = false;
     public List<Integer> accessibleSlots = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package net.boster.gui;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.boster.gui.button.GUIButton;
 import net.boster.gui.craft.CraftCustomGUI;
 import net.boster.gui.utils.GUIUtils;
@@ -24,6 +25,8 @@ public class CustomGUI implements GUI {
     @Getter @NotNull protected final Player player;
     @Getter @NotNull protected Inventory inventory;
     @Getter @NotNull protected final CraftCustomGUI gui;
+
+    @Getter @Setter @NotNull private Map<String, Object> data = new HashMap<>();
 
     protected BukkitTask closedTask;
     @Getter protected boolean closed = false;
