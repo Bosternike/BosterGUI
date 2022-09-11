@@ -155,13 +155,17 @@ public class MultiPageGUI implements GUI {
     public void open() {
         currentItems.clear();
 
-        inventory = creator.getGUI(this);
+        inventory = creator.getGUI(this, prepareTitle());
         prepare();
         addSwitchers();
         loadItems();
 
         setClosed(1);
         player.openInventory(inventory);
+    }
+
+    public @Nullable String prepareTitle() {
+        return getTitle();
     }
 
     public @Nullable MultiPageButton isSwitchSlot(@NotNull List<MultiPageButton> buttons, int slot) {
