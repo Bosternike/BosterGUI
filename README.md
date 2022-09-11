@@ -13,7 +13,7 @@
 <dependency>
     <groupId>com.github.Bosternike</groupId>
     <artifactId>BosterGUI</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -28,6 +28,6 @@ allprojects {
 ```
 ```groovy
 dependencies {
-    implementation 'com.github.Bosternike:BosterGUI:1.0.5'
+    implementation 'com.github.Bosternike:BosterGUI:1.0.6'
 }
 ```

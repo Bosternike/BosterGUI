@@ -11,6 +11,8 @@ public class BosterGUI {
     @Getter private static Plugin provider;
 
     public static void setup(@NotNull Plugin plugin) {
+        if(provider != null) return;
+
         provider = plugin;
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), plugin);
     }
