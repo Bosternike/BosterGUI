@@ -95,7 +95,10 @@ public class CustomGUI implements GUI {
     }
 
     public void onClick(InventoryClickEvent e) {
-        if(closed) return;
+        if(closed) {
+            e.setCancelled(true);
+            return;
+        }
 
         Player p = (Player) e.getWhoClicked();
 

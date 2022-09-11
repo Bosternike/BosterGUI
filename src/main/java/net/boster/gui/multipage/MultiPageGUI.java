@@ -210,6 +210,11 @@ public class MultiPageGUI implements GUI {
             return;
         }
 
+        if(closed) {
+            e.setCancelled(true);
+            return;
+        }
+
         e.setCancelled(!checkAccess(e.getSlot()));
 
         MultiPageButton mb = isSwitchSlot(nextButtons, e.getSlot());
@@ -248,7 +253,7 @@ public class MultiPageGUI implements GUI {
 
     public void onClose(InventoryCloseEvent e) {
         Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
-            if(inventory != player.getOpenInventory().getTopInventory()) {
+            if(!closed && inventory != player.getOpenInventory().getTopInventory()) {
                 clear();
             }
         }, 1);
