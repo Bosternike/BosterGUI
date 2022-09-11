@@ -56,6 +56,8 @@ public class MultiPageGUI implements GUI {
         this.player = player;
         this.creator = new CraftSizedGUI(null, 9);
         this.inventory = creator.getGUI(this);
+
+        user.put(player, this);
     }
 
     public int getSize() {
