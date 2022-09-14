@@ -117,10 +117,6 @@ public class MultiPageGUI implements GUI {
                 inventory.setItem(b.getSlot(), i);
             }
         }
-
-        for(int i : slots) {
-            inventory.setItem(i, null);
-        }
     }
 
     public void addSwitchers() {
