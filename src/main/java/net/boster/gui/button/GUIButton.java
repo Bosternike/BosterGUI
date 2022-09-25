@@ -1,7 +1,10 @@
 package net.boster.gui.button;
 
+import net.boster.gui.GUI;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface GUIButton {
@@ -12,12 +15,8 @@ public interface GUIButton {
     default void onClick(Player p) {
     }
 
-    default void onLeftClick(Player p) {
-        onClick(p);
-    }
-
-    default void onRightClick(Player p) {
-        onClick(p);
+    default void onClick(@NotNull GUI gui, @NotNull InventoryClickEvent event) {
+        onClick((Player) event.getWhoClicked());
     }
 
     @Nullable ItemStack prepareItem(Player p);

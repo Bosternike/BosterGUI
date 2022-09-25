@@ -111,11 +111,7 @@ public class CustomGUI implements GUI {
         GUIButton b = gui.getButton(e.getSlot());
 
         if(b != null) {
-            if(e.isRightClick()) {
-                b.onRightClick(p);
-            } else {
-                b.onLeftClick(p);
-            }
+            b.onClick(this, e);
         }
     }
 

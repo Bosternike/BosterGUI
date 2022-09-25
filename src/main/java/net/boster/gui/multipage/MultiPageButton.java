@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface MultiPageButton extends MultiPageEntry {
 
-    default void performPage(MultiPageGUI gui) {
+    default void performPage(@NotNull MultiPageGUI gui) {
         throw new UnsupportedOperationException();
     }
 

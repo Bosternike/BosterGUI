@@ -225,31 +225,19 @@ public class MultiPageGUI implements GUI {
         }
         if(mb != null) {
             mb.performPage(this);
-            if(e.isRightClick()) {
-                mb.onRightClick(this, player, this.getPageNumber(), e.getSlot());
-            } else {
-                mb.onLeftClick(this, player, this.getPageNumber(), e.getSlot());
-            }
+            mb.onClick(this, e);
             return;
         }
 
         MultiPageFunctionalEntry me = currentItems.get(e.getSlot());
         if(me != null) {
-            if(e.isRightClick()) {
-                me.onRightClick(this, player, pageNumber, e.getSlot());
-            } else {
-                me.onLeftClick(this, player, pageNumber, e.getSlot());
-            }
+            mb.onClick(this, e);
             return;
         }
 
         GUIButton gb = buttons.get(e.getSlot());
         if(gb != null) {
-            if(e.isRightClick()) {
-                gb.onRightClick(player);
-            } else {
-                gb.onLeftClick(player);
-            }
+            gb.onClick(this, e);
         }
     }
 
