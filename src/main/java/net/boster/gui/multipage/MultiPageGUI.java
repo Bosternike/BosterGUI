@@ -231,7 +231,7 @@ public class MultiPageGUI implements GUI {
 
         MultiPageFunctionalEntry me = currentItems.get(e.getSlot());
         if(me != null) {
-            mb.onClick(this, e);
+            me.onClick(this, e);
             return;
         }
 
