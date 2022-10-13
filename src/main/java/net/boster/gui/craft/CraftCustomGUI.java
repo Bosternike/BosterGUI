@@ -26,8 +26,8 @@ public class CraftCustomGUI {
     public List<Integer> accessibleSlots = new ArrayList<>();
 
     public CraftCustomGUI(int size, @Nullable String title) {
-        if(!setSize(size)) {
-            this.creator = new CraftSizedGUI(title, 9);
+        if(!setCreator(title, size)) {
+            this.creator = new CraftSizedGUI(title, 54);
         }
     }
 
@@ -44,11 +44,11 @@ public class CraftCustomGUI {
     }
 
     public CraftCustomGUI(@Nullable String title) {
-        this(9, title);
+        this(54, title);
     }
 
     public CraftCustomGUI() {
-        this(9, null);
+        this(54, null);
     }
 
     public @NotNull Inventory getGUI(@NotNull GUI holder, @Nullable String title) {
@@ -103,6 +103,16 @@ public class CraftCustomGUI {
         try {
             Bukkit.createInventory(null, i);
             this.creator = new CraftSizedGUI(getTitle(), i);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean setCreator(String title, int size) {
+        try {
+            Bukkit.createInventory(null, size);
+            this.creator = new CraftSizedGUI(title, size);
             return true;
         } catch (Exception e) {
             return false;
