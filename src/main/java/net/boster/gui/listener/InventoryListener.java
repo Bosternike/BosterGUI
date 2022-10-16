@@ -22,7 +22,7 @@ public class InventoryListener implements Listener {
     public void onClick(InventoryClickEvent e) {
         if(e.getClickedInventory() == null) return;
 
-        if(e.getClickedInventory().getHolder() instanceof GUI) {
+        if(e.getInventory().getHolder() instanceof GUI) {
             ((GUI) e.getInventory().getHolder()).onClick(e);
         }
     }
