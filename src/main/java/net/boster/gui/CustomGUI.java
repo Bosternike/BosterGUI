@@ -35,7 +35,7 @@ public class CustomGUI implements GUI {
         openedMap.put(p, this);
         this.player = p;
         this.gui = gui;
-        this.inventory = gui.getGUI(this);
+        this.inventory = gui.getGUI();
     }
 
     public CustomGUI(@NotNull Player p, @NotNull String title, int size) {
@@ -54,8 +54,16 @@ public class CustomGUI implements GUI {
         this(p, new CraftCustomGUI());
     }
 
-    public static CustomGUI get(Player p) {
+    public static CustomGUI get(@NotNull Player p) {
         return openedMap.get(p);
+    }
+
+    public static @Nullable CustomGUI get(@NotNull Inventory inv) {
+        for(CustomGUI g : openedMap.values()) {
+            if(g.inventory == inv) return g;
+        }
+
+        return null;
     }
 
     public void open() {
@@ -64,14 +72,13 @@ public class CustomGUI implements GUI {
 
     public void open(@Nullable String title) {
         setClosed(1);
-        inventory = gui.getGUI(this, title);
+        inventory = gui.getGUI(title);
         fillGUI();
         player.openInventory(inventory);
-        gui.onOpen(player);
     }
 
     public void fillGUI() {
-        for(GUIButton i : gui.getButtons()) {
+        for (GUIButton i : gui.getButtons()) {
             inventory.setItem(i.getSlot(), i.prepareItem(player));
         }
     }
@@ -94,16 +101,16 @@ public class CustomGUI implements GUI {
         }, ticks);
     }
 
-    public void onClick(InventoryClickEvent e) {
+    public void onClick(@NotNull InventoryClickEvent e) {
         if(closed) {
-            e.setCancelled(true);
+            onClosedClick(e);
             return;
         }
 
-        Player p = (Player) e.getWhoClicked();
+        if(e.getClickedInventory() == null) return;
 
         if(e.getClickedInventory().getHolder() instanceof Player) {
-            e.setCancelled(!gui.accessPlayerInventory);
+            onPlayerInventoryClick(e);
             return;
         }
 
@@ -115,12 +122,19 @@ public class CustomGUI implements GUI {
         }
     }
 
-    public void onClose(InventoryCloseEvent e) {
+    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+    public void onClosedClick(@NotNull InventoryClickEvent e) {
+    }
+
+    public void onPlayerInventoryClick(@NotNull InventoryClickEvent e) {
+        e.setCancelled(!gui.accessPlayerInventory);
+    }
+
+    public void onClose(@NotNull InventoryCloseEvent e) {
         Player p = (Player) e.getPlayer();
 
         Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
             if(!closed && inventory != p.getOpenInventory().getTopInventory()) {
-                gui.onClose(p);
                 clear();
             }
         }, 1);

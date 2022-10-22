@@ -2,11 +2,9 @@ package net.boster.gui.craft;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.boster.gui.GUI;
 import net.boster.gui.InventoryCreator;
 import net.boster.gui.button.GUIButton;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +17,6 @@ public class CraftCustomGUI {
     private final HashMap<Integer, GUIButton> buttons = new HashMap<>();
 
     @Getter @Setter @NotNull private InventoryCreator creator;
-
-    @Getter @Setter @Nullable private CraftGUIActions actions;
 
     public boolean accessPlayerInventory = false;
     public List<Integer> accessibleSlots = new ArrayList<>();
@@ -51,12 +47,12 @@ public class CraftCustomGUI {
         this(54, null);
     }
 
-    public @NotNull Inventory getGUI(@NotNull GUI holder, @Nullable String title) {
-        return creator.getGUI(holder, title);
+    public @NotNull Inventory getGUI(@Nullable String title) {
+        return creator.getGUI(title);
     }
 
-    public @NotNull Inventory getGUI(@NotNull GUI holder) {
-        return creator.getGUI(holder);
+    public @NotNull Inventory getGUI() {
+        return creator.getGUI();
     }
 
     public @Nullable GUIButton getButton(int i) {
@@ -69,22 +65,6 @@ public class CraftCustomGUI {
 
     public void removeButton(int i) {
         buttons.remove(i);
-    }
-
-    public void setClosed(Player p) {
-        onClose(p);
-    }
-
-    public void onClose(Player p) {
-        if(actions != null) {
-            actions.onClose(p);
-        }
-    }
-
-    public void onOpen(Player p) {
-        if(actions != null) {
-            actions.onOpen(p);
-        }
     }
 
     public int getSize() {

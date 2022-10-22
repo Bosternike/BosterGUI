@@ -12,8 +12,8 @@ public abstract class InventoryCreator {
 
     @Getter @Setter @Nullable protected String title;
 
-    @NotNull public abstract Inventory getGUI(@NotNull GUI holder);
-    @NotNull public abstract Inventory getGUI(@NotNull GUI holder, @Nullable String title);
+    @NotNull public abstract Inventory getGUI();
+    @NotNull public abstract Inventory getGUI(@Nullable String title);
 
     public abstract int getSize();
 }

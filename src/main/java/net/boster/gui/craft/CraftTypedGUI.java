@@ -1,7 +1,6 @@
 package net.boster.gui.craft;
 
 import lombok.Getter;
-import net.boster.gui.GUI;
 import net.boster.gui.InventoryCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
@@ -21,16 +20,16 @@ public class CraftTypedGUI extends InventoryCreator {
     }
 
     @Override
-    public @NotNull Inventory getGUI(@NotNull GUI holder) {
-        return getGUI(holder, title);
+    public @NotNull Inventory getGUI() {
+        return getGUI(title);
     }
 
     @Override
-    public @NotNull Inventory getGUI(@NotNull GUI holder, @Nullable String title) {
+    public @NotNull Inventory getGUI(@Nullable String title) {
         if(title != null) {
-            return Bukkit.createInventory(holder, type, title);
+            return Bukkit.createInventory(null, type, title);
         } else {
-            return Bukkit.createInventory(holder, type);
+            return Bukkit.createInventory(null, type);
         }
     }
 }

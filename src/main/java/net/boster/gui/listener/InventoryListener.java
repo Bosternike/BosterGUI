@@ -1,6 +1,7 @@
 package net.boster.gui.listener;
 
-import net.boster.gui.GUI;
+import net.boster.gui.CustomGUI;
+import net.boster.gui.multipage.MultiPageGUI;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -11,19 +12,29 @@ public class InventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClose(InventoryCloseEvent e) {
-        if(e.getInventory() == null) return;
+        CustomGUI gui = CustomGUI.get(e.getInventory());
+        if(gui != null) {
+            gui.onClose(e);
+            return;
+        }
 
-        if(e.getInventory().getHolder() instanceof GUI) {
-            ((GUI) e.getInventory().getHolder()).onClose(e);
+        MultiPageGUI mpg = MultiPageGUI.get(e.getInventory());
+        if(mpg != null) {
+            mpg.onClose(e);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
-        if(e.getClickedInventory() == null) return;
+        CustomGUI gui = CustomGUI.get(e.getInventory());
+        if(gui != null) {
+            gui.onClick(e);
+            return;
+        }
 
-        if(e.getInventory().getHolder() instanceof GUI) {
-            ((GUI) e.getInventory().getHolder()).onClick(e);
+        MultiPageGUI mpg = MultiPageGUI.get(e.getInventory());
+        if(mpg != null) {
+            mpg.onClick(e);
         }
     }
 }

@@ -55,9 +55,21 @@ public class MultiPageGUI implements GUI {
     public MultiPageGUI(@NotNull Player player) {
         this.player = player;
         this.creator = new CraftSizedGUI(null, 9);
-        this.inventory = creator.getGUI(this);
+        this.inventory = creator.getGUI();
 
         user.put(player, this);
+    }
+
+    public static @Nullable MultiPageGUI get(@NotNull Player p) {
+        return user.get(p);
+    }
+
+    public static @Nullable MultiPageGUI get(@NotNull Inventory inv) {
+        for(MultiPageGUI g : user.values()) {
+            if(g.inventory == inv) return g;
+        }
+
+        return null;
     }
 
     public int getSize() {
@@ -84,10 +96,6 @@ public class MultiPageGUI implements GUI {
 
     public void setType(@NotNull InventoryType type) {
         creator = new CraftTypedGUI(getTitle(), type);
-    }
-
-    public static @Nullable MultiPageGUI get(Player p) {
-        return user.get(p);
     }
 
     public boolean newPage() {
@@ -153,7 +161,7 @@ public class MultiPageGUI implements GUI {
     public void open() {
         currentItems.clear();
 
-        inventory = creator.getGUI(this, prepareTitle());
+        inventory = creator.getGUI(prepareTitle());
         prepare();
         addSwitchers();
         loadItems();
@@ -206,14 +214,16 @@ public class MultiPageGUI implements GUI {
         return accessibleSlots.contains(slot);
     }
 
-    public void onClick(InventoryClickEvent e) {
-        if(e.getClickedInventory().getHolder() instanceof Player) {
-            e.setCancelled(!accessPlayerInventory);
+    public void onClick(@NotNull InventoryClickEvent e) {
+        if(closed) {
+            onClosedClick(e);
             return;
         }
 
-        if(closed) {
-            e.setCancelled(true);
+        if(e.getClickedInventory() == null) return;
+
+        if(e.getClickedInventory().getHolder() instanceof Player) {
+            onPlayerInventoryClick(e);
             return;
         }
 
@@ -241,7 +251,15 @@ public class MultiPageGUI implements GUI {
         }
     }
 
-    public void onClose(InventoryCloseEvent e) {
+    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+    public void onClosedClick(@NotNull InventoryClickEvent e) {
+    }
+
+    public void onPlayerInventoryClick(@NotNull InventoryClickEvent e) {
+        e.setCancelled(!accessPlayerInventory);
+    }
+
+    public void onClose(@NotNull InventoryCloseEvent e) {
         Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
             if(!closed && inventory != player.getOpenInventory().getTopInventory()) {
                 clear();
