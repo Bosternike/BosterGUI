@@ -12,12 +12,12 @@ public interface GUIButton {
     int getSlot();
 
     @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
-    default void onClick(Player p) {
+    default void onClick(@NotNull Player p) {
     }
 
     default void onClick(@NotNull GUI gui, @NotNull InventoryClickEvent event) {
         onClick((Player) event.getWhoClicked());
     }
 
-    @Nullable ItemStack prepareItem(Player p);
+    @Nullable ItemStack prepareItem(@NotNull Player p);
 }

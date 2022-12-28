@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.boster.gui.button.GUIButton;
 import net.boster.gui.craft.CraftCustomGUI;
-import net.boster.gui.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,20 +15,23 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
+@Getter
+@Setter
 public class CustomGUI implements GUI {
 
     public static final HashMap<Player, CustomGUI> openedMap = new HashMap<>();
 
-    @Getter @NotNull protected final Player player;
-    @Getter @NotNull protected Inventory inventory;
-    @Getter @NotNull protected final CraftCustomGUI gui;
+    @NotNull protected final Player player;
+    @NotNull protected Inventory inventory;
+    @NotNull protected final CraftCustomGUI gui;
 
-    @Getter @Setter @NotNull private Map<String, Object> data = new HashMap<>();
+    @NotNull private Map<String, Object> data = new HashMap<>();
 
     protected BukkitTask closedTask;
-    @Getter protected boolean closed = false;
+    protected boolean closed = false;
+
+    @NotNull private InventoryClickActions clickActions = new InventoryClickActions();
 
     public CustomGUI(@NotNull Player p, @NotNull CraftCustomGUI gui) {
         openedMap.put(p, this);
@@ -122,12 +124,18 @@ public class CustomGUI implements GUI {
         }
     }
 
-    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
     public void onClosedClick(@NotNull InventoryClickEvent e) {
+        if(clickActions.getOnClosedClick() != null) {
+            clickActions.getOnClosedClick().accept(e);
+        }
     }
 
     public void onPlayerInventoryClick(@NotNull InventoryClickEvent e) {
-        e.setCancelled(!gui.accessPlayerInventory);
+        if(clickActions.getOnPlayerInventoryClick() == null) {
+            e.setCancelled(!gui.accessPlayerInventory);
+        } else {
+            clickActions.getOnPlayerInventoryClick().accept(e);
+        }
     }
 
     public void onClose(@NotNull InventoryCloseEvent e) {
@@ -142,11 +150,6 @@ public class CustomGUI implements GUI {
 
     public void clear() {
         openedMap.remove(player);
-    }
-
-    @Override
-    public void log(@NotNull String s, @NotNull Level log) {
-        Bukkit.getLogger().log(log, GUIUtils.toColor("[BosterGUI] (CustomGUI): " + s));
     }
 
     @Override

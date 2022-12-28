@@ -4,7 +4,7 @@ public enum MultiPageButtonAppearance {
 
     NEEDED {
         @Override
-        public boolean checkAppear(MultiPageGUI gui, boolean next) {
+        public boolean shouldAppear(MultiPageGUI gui, boolean next) {
             if(next) {
                 return gui.getPageNumber() < gui.getPages();
             } else {
@@ -14,10 +14,10 @@ public enum MultiPageButtonAppearance {
     },
     ALWAYS {
         @Override
-        public boolean checkAppear(MultiPageGUI gui, boolean next) {
+        public boolean shouldAppear(MultiPageGUI gui, boolean next) {
             return true;
         }
     };
 
-    public abstract boolean checkAppear(MultiPageGUI gui, boolean next);
+    public abstract boolean shouldAppear(MultiPageGUI gui, boolean next);
 }

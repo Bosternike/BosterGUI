@@ -12,11 +12,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+@Getter
+@Setter
 public class CraftCustomGUI {
 
     private final HashMap<Integer, GUIButton> buttons = new HashMap<>();
 
-    @Getter @Setter @NotNull private InventoryCreator creator;
+    @NotNull private InventoryCreator creator;
 
     public boolean accessPlayerInventory = false;
     public List<Integer> accessibleSlots = new ArrayList<>();

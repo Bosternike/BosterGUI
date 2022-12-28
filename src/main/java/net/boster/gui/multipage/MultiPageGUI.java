@@ -4,11 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import net.boster.gui.BosterGUI;
 import net.boster.gui.GUI;
+import net.boster.gui.InventoryClickActions;
 import net.boster.gui.InventoryCreator;
 import net.boster.gui.button.GUIButton;
+import net.boster.gui.craft.CraftCustomGUI;
 import net.boster.gui.craft.CraftSizedGUI;
 import net.boster.gui.craft.CraftTypedGUI;
-import net.boster.gui.utils.GUIUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,41 +22,56 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.logging.Level;
 
+@Getter
+@Setter
 public class MultiPageGUI implements GUI {
 
     private static final HashMap<Player, MultiPageGUI> user = new HashMap<>();
 
-    @Getter @Setter @NotNull private List<MultiPageButton> nextButtons = new ArrayList<>();
-    @Getter @Setter @NotNull private List<MultiPageButton> previousButtons = new ArrayList<>();
+    @NotNull private List<MultiPageButton> nextButtons = new ArrayList<>();
+    @NotNull private List<MultiPageButton> previousButtons = new ArrayList<>();
 
-    @Getter @NotNull private final Player player;
-    @Getter @Setter @NotNull private InventoryCreator creator;
-    @Getter @NotNull private Inventory inventory;
+    @NotNull private final Player player;
+    @NotNull private InventoryCreator creator;
+    @NotNull private Inventory inventory;
 
-    @Getter @Setter private int pages;
-    @Getter private int pageNumber = 1;
-    @Getter private int actualFrom = 0;
-    @Getter @Setter @NotNull private List<Integer> slots = new ArrayList<>();
+    private int pages;
+    private int pageNumber = 1;
+    private int actualFrom = 0;
+    @NotNull private List<Integer> slots = new ArrayList<>();
 
-    @Getter @Setter @NotNull private Map<Integer, GUIButton> buttons = new HashMap<>();
+    @NotNull private Map<Integer, GUIButton> buttons = new HashMap<>();
 
-    @Getter @Setter @NotNull private List<MultiPageFunctionalEntry> items = new ArrayList<>();
-    @Getter @Setter @NotNull private Map<Integer, MultiPageFunctionalEntry> currentItems = new LinkedHashMap<>();
+    @NotNull private List<MultiPageFunctionalEntry> items = new ArrayList<>();
+    @NotNull private Map<Integer, MultiPageFunctionalEntry> currentItems = new LinkedHashMap<>();
 
-    @Getter @Setter @NotNull private Map<String, Object> data = new HashMap<>();
+    @NotNull private Map<String, Object> data = new HashMap<>();
 
     public boolean accessPlayerInventory = false;
     public List<Integer> accessibleSlots = new ArrayList<>();
 
     private BukkitTask closedTask;
-    @Getter private boolean closed = false;
+    private boolean closed = false;
+
+    @NotNull private InventoryClickActions clickActions = new InventoryClickActions();
 
     public MultiPageGUI(@NotNull Player player) {
         this.player = player;
         this.creator = new CraftSizedGUI(null, 9);
         this.inventory = creator.getGUI();
+
+        user.put(player, this);
+    }
+
+    public MultiPageGUI(@NotNull Player player, @NotNull CraftCustomGUI gui) {
+        this.player = player;
+        this.creator = gui.getCreator();
+        this.inventory = creator.getGUI();
+
+        buttons.putAll(gui.getButtonMap());
+        accessPlayerInventory = gui.accessPlayerInventory;
+        accessibleSlots.addAll(gui.accessibleSlots);
 
         user.put(player, this);
     }
@@ -101,7 +117,7 @@ public class MultiPageGUI implements GUI {
     public boolean newPage() {
         if(pageNumber < pages) {
             pageNumber = pageNumber + 1;
-            actualFrom = actualFrom + slots.size();
+            actualFrom = actualFrom + currentItems.size();
             return true;
         } else {
             return false;
@@ -111,7 +127,7 @@ public class MultiPageGUI implements GUI {
     public boolean pastPage() {
         if(pageNumber > 1) {
             pageNumber = pageNumber - 1;
-            actualFrom = actualFrom - slots.size();
+            actualFrom = actualFrom - currentItems.size();
             return true;
         } else {
             return false;
@@ -129,7 +145,7 @@ public class MultiPageGUI implements GUI {
 
     public void addSwitchers() {
         for(MultiPageButton i : nextButtons) {
-            if(i.getAppearance().checkAppear(this, true)) {
+            if(i.getAppearance().shouldAppear(this, true)) {
                 ItemStack item = i.item(player);
                 if(item != null) {
                     inventory.setItem(i.getSlot(), item);
@@ -137,7 +153,7 @@ public class MultiPageGUI implements GUI {
             }
         }
         for(MultiPageButton i : previousButtons) {
-            if(i.getAppearance().checkAppear(this, false)) {
+            if(i.getAppearance().shouldAppear(this, false)) {
                 ItemStack item = i.item(player);
                 if(item != null) {
                     inventory.setItem(i.getSlot(), item);
@@ -147,14 +163,15 @@ public class MultiPageGUI implements GUI {
     }
 
     public void loadItems() {
-        for(int i = 0; i < slots.size(); i++) {
-            int slot = slots.get(i);
-            if(slot >= inventory.getSize()) continue;
-            if(actualFrom + i >= items.size()) break;
+        int d = 0;
+        for (int slot : slots) {
+            if (slot >= inventory.getSize()) continue;
+            if (actualFrom + d >= items.size()) break;
 
-            MultiPageFunctionalEntry e = items.get(actualFrom + i);
+            MultiPageFunctionalEntry e = items.get(actualFrom + d);
             inventory.setItem(slot, e.item(player, pageNumber, slot));
             currentItems.put(slot, e);
+            d++;
         }
     }
 
@@ -170,11 +187,17 @@ public class MultiPageGUI implements GUI {
         player.openInventory(inventory);
     }
 
+    public void update() {
+        prepare();
+        addSwitchers();
+        loadItems();
+    }
+
     public @Nullable String prepareTitle() {
         return getTitle();
     }
 
-    public @Nullable MultiPageButton isSwitchSlot(@NotNull List<MultiPageButton> buttons, int slot) {
+    public @Nullable MultiPageButton getSwitchSlot(@NotNull List<MultiPageButton> buttons, int slot) {
         for(MultiPageButton b : buttons) {
             if(b.getSlot() == slot) {
                 return b;
@@ -229,9 +252,9 @@ public class MultiPageGUI implements GUI {
 
         e.setCancelled(!checkAccess(e.getSlot()));
 
-        MultiPageButton mb = isSwitchSlot(nextButtons, e.getSlot());
+        MultiPageButton mb = getSwitchSlot(nextButtons, e.getSlot());
         if(mb == null) {
-            mb = isSwitchSlot(previousButtons, e.getSlot());
+            mb = getSwitchSlot(previousButtons, e.getSlot());
         }
         if(mb != null) {
             mb.performPage(this);
@@ -251,12 +274,18 @@ public class MultiPageGUI implements GUI {
         }
     }
 
-    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
     public void onClosedClick(@NotNull InventoryClickEvent e) {
+        if(clickActions.getOnClosedClick() != null) {
+            clickActions.getOnClosedClick().accept(e);
+        }
     }
 
     public void onPlayerInventoryClick(@NotNull InventoryClickEvent e) {
-        e.setCancelled(!accessPlayerInventory);
+        if(clickActions.getOnPlayerInventoryClick() == null) {
+            e.setCancelled(!accessPlayerInventory);
+        } else {
+            clickActions.getOnPlayerInventoryClick().accept(e);
+        }
     }
 
     public void onClose(@NotNull InventoryCloseEvent e) {
@@ -265,10 +294,5 @@ public class MultiPageGUI implements GUI {
                 clear();
             }
         }, 1);
-    }
-
-    @Override
-    public void log(@NotNull String s, @NotNull Level log) {
-        Bukkit.getLogger().log(log, GUIUtils.toColor("[BosterGUI] (MultiPageGUI): " + s));
     }
 }
