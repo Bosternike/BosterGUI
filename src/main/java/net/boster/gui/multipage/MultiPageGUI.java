@@ -27,7 +27,7 @@ import java.util.*;
 @Setter
 public class MultiPageGUI implements GUI {
 
-    private static final HashMap<Player, MultiPageGUI> user = new HashMap<>();
+    private static final HashMap<Player, MultiPageGUI> viewers = new HashMap<>();
 
     @NotNull private List<MultiPageButton> nextButtons = new ArrayList<>();
     @NotNull private List<MultiPageButton> previousButtons = new ArrayList<>();
@@ -61,7 +61,7 @@ public class MultiPageGUI implements GUI {
         this.creator = new CraftSizedGUI(null, 9);
         this.inventory = creator.getGUI();
 
-        user.put(player, this);
+        viewers.put(player, this);
     }
 
     public MultiPageGUI(@NotNull Player player, @NotNull CraftCustomGUI gui) {
@@ -73,15 +73,15 @@ public class MultiPageGUI implements GUI {
         accessPlayerInventory = gui.accessPlayerInventory;
         accessibleSlots.addAll(gui.accessibleSlots);
 
-        user.put(player, this);
+        viewers.put(player, this);
     }
 
     public static @Nullable MultiPageGUI get(@NotNull Player p) {
-        return user.get(p);
+        return viewers.get(p);
     }
 
     public static @Nullable MultiPageGUI get(@NotNull Inventory inv) {
-        for(MultiPageGUI g : user.values()) {
+        for(MultiPageGUI g : viewers.values()) {
             if(g.inventory == inv) return g;
         }
 
@@ -218,7 +218,7 @@ public class MultiPageGUI implements GUI {
             closedTask.cancel();
         }
 
-        Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
+        closedTask = Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
             closed = false;
             closedTask = null;
             if(!player.isOnline()) {
@@ -228,7 +228,7 @@ public class MultiPageGUI implements GUI {
     }
 
     public void clear() {
-        user.remove(player);
+        viewers.remove(player);
     }
 
     public boolean checkAccess(int slot) {
@@ -238,12 +238,12 @@ public class MultiPageGUI implements GUI {
     }
 
     public void onClick(@NotNull InventoryClickEvent e) {
-        if(closed) {
-            onClosedClick(e);
+        if(e.getClickedInventory() == null) {
+            if(clickActions.getOutOfInventoryClick() != null) {
+                clickActions.getOutOfInventoryClick().accept(e);
+            }
             return;
         }
-
-        if(e.getClickedInventory() == null) return;
 
         if(e.getClickedInventory().getHolder() instanceof Player) {
             onPlayerInventoryClick(e);
@@ -271,12 +271,6 @@ public class MultiPageGUI implements GUI {
         GUIButton gb = buttons.get(e.getSlot());
         if(gb != null) {
             gb.onClick(this, e);
-        }
-    }
-
-    public void onClosedClick(@NotNull InventoryClickEvent e) {
-        if(clickActions.getOnClosedClick() != null) {
-            clickActions.getOnClosedClick().accept(e);
         }
     }
 

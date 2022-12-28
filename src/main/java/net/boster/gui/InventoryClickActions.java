@@ -11,6 +11,6 @@ import java.util.function.Consumer;
 @Setter
 public class InventoryClickActions {
 
-    @Nullable private Consumer<InventoryClickEvent> onClosedClick;
+    @Nullable private Consumer<InventoryClickEvent> outOfInventoryClick;
     @Nullable private Consumer<InventoryClickEvent> onPlayerInventoryClick;
 }

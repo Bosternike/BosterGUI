@@ -20,7 +20,7 @@ import java.util.Map;
 @Setter
 public class CustomGUI implements GUI {
 
-    public static final HashMap<Player, CustomGUI> openedMap = new HashMap<>();
+    public static final HashMap<Player, CustomGUI> viewers = new HashMap<>();
 
     @NotNull protected final Player player;
     @NotNull protected Inventory inventory;
@@ -34,7 +34,7 @@ public class CustomGUI implements GUI {
     @NotNull private InventoryClickActions clickActions = new InventoryClickActions();
 
     public CustomGUI(@NotNull Player p, @NotNull CraftCustomGUI gui) {
-        openedMap.put(p, this);
+        viewers.put(p, this);
         this.player = p;
         this.gui = gui;
         this.inventory = gui.getGUI();
@@ -57,11 +57,11 @@ public class CustomGUI implements GUI {
     }
 
     public static CustomGUI get(@NotNull Player p) {
-        return openedMap.get(p);
+        return viewers.get(p);
     }
 
     public static @Nullable CustomGUI get(@NotNull Inventory inv) {
-        for(CustomGUI g : openedMap.values()) {
+        for(CustomGUI g : viewers.values()) {
             if(g.inventory == inv) return g;
         }
 
@@ -90,11 +90,13 @@ public class CustomGUI implements GUI {
     }
 
     public void setClosed(int ticks) {
+        closed = true;
+
         if(closedTask != null) {
             closedTask.cancel();
         }
 
-        Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
+        closedTask = Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
             closed = false;
             closedTask = null;
             if(!player.isOnline()) {
@@ -104,12 +106,12 @@ public class CustomGUI implements GUI {
     }
 
     public void onClick(@NotNull InventoryClickEvent e) {
-        if(closed) {
-            onClosedClick(e);
+        if(e.getClickedInventory() == null) {
+            if(clickActions.getOutOfInventoryClick() != null) {
+                clickActions.getOutOfInventoryClick().accept(e);
+            }
             return;
         }
-
-        if(e.getClickedInventory() == null) return;
 
         if(e.getClickedInventory().getHolder() instanceof Player) {
             onPlayerInventoryClick(e);
@@ -121,12 +123,6 @@ public class CustomGUI implements GUI {
 
         if(b != null) {
             b.onClick(this, e);
-        }
-    }
-
-    public void onClosedClick(@NotNull InventoryClickEvent e) {
-        if(clickActions.getOnClosedClick() != null) {
-            clickActions.getOnClosedClick().accept(e);
         }
     }
 
@@ -149,7 +145,7 @@ public class CustomGUI implements GUI {
     }
 
     public void clear() {
-        openedMap.remove(player);
+        viewers.remove(player);
     }
 
     @Override

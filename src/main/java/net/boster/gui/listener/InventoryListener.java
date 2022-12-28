@@ -27,13 +27,13 @@ public class InventoryListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
         CustomGUI gui = CustomGUI.get(e.getInventory());
-        if(gui != null) {
+        if(gui != null && !gui.isClosed()) {
             gui.onClick(e);
             return;
         }
 
         MultiPageGUI mpg = MultiPageGUI.get(e.getInventory());
-        if(mpg != null) {
+        if(mpg != null && !mpg.isClosed()) {
             mpg.onClick(e);
         }
     }
