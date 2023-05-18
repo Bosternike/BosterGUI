@@ -17,6 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+import java.util.function.Function;
+
 public class SimpleConstructor {
 
     @Nullable protected String title;
@@ -46,7 +49,9 @@ public class SimpleConstructor {
 
         craftGUI = new CraftCustomGUI();
         craftGUI.setCreator(inventoryCreator);
+    }
 
+    public void loadDefaultItems(@NotNull ConfigurationSection section) {
         ConfigurationSection items = section.getConfigurationSection("Items");
         if(items != null) {
             loadItems(items, (PlaceholdersProvider) null);
@@ -54,8 +59,41 @@ public class SimpleConstructor {
     }
 
     public <T extends GUIButton> void loadItems(@NotNull ConfigurationSection items, @NotNull Class<T> clazz) {
-        for(T t : ButtonUtils.loadAll(items, clazz)) {
-            craftGUI.addButton(t);
+        loadItems(items, clazz, null);
+    }
+
+    public <T extends GUIButton> void loadItems(@NotNull ConfigurationSection items, @NotNull Class<T> clazz, @Nullable PlaceholdersProvider replacer) {
+        loadItems(items, c -> {
+            GUIButton i = ButtonUtils.load(c, clazz);
+
+            if(replacer != null && i instanceof SimpleButtonItem) {
+                ((SimpleButtonItem) i).setPlaceholdersProvider(p -> replacer);
+            }
+
+            return i;
+        });
+    }
+
+    public void loadItems(@NotNull ConfigurationSection items, @NotNull Function<ConfigurationSection, GUIButton> function) {
+        for(String s : items.getKeys(false)) {
+            ConfigurationSection c = items.getConfigurationSection(s);
+            if(c == null) continue;
+
+            GUIButton i = Objects.requireNonNull(function.apply(c));
+
+            for(Integer slot : ButtonUtils.getSlots(c)) {
+                craftGUI.addButton(new GUIButton() {
+                    @Override
+                    public int getSlot() {
+                        return slot;
+                    }
+
+                    @Override
+                    public ItemStack prepareItem(@NotNull Player player) {
+                        return i.prepareItem(player);
+                    }
+                });
+            }
         }
     }
 
