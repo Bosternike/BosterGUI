@@ -1,6 +1,7 @@
 package net.boster.gui.constructor;
 
 import net.boster.gui.InventoryCreator;
+import net.boster.gui.button.ClickableButton;
 import net.boster.gui.button.GUIButton;
 import net.boster.gui.button.SimpleButtonItem;
 import net.boster.gui.craft.CraftCustomGUI;
@@ -66,8 +67,8 @@ public class SimpleConstructor {
         loadItems(items, c -> {
             GUIButton i = ButtonUtils.load(c, clazz);
 
-            if(replacer != null && i instanceof SimpleButtonItem) {
-                ((SimpleButtonItem) i).setPlaceholdersProvider(p -> replacer);
+            if(replacer != null && i instanceof ClickableButton) {
+                ((ClickableButton) i).setPlaceholdersProvider(p -> replacer);
             }
 
             return i;
