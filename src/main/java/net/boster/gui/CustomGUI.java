@@ -31,7 +31,7 @@ public class CustomGUI implements GUI {
     protected BukkitTask closedTask;
     protected boolean closed = false;
 
-    @NotNull private InventoryClickActions clickActions = new InventoryClickActions();
+    @NotNull private InventoryActions actions = new InventoryActions();
 
     public CustomGUI(@NotNull Player p, @NotNull CraftCustomGUI gui) {
         viewers.put(p, this);
@@ -107,8 +107,8 @@ public class CustomGUI implements GUI {
 
     public void onClick(@NotNull InventoryClickEvent e) {
         if(e.getClickedInventory() == null) {
-            if(clickActions.getOutOfInventoryClick() != null) {
-                clickActions.getOutOfInventoryClick().accept(e);
+            if(actions.getOutOfInventoryClick() != null) {
+                actions.getOutOfInventoryClick().accept(e);
             }
             return;
         }
@@ -127,10 +127,10 @@ public class CustomGUI implements GUI {
     }
 
     public void onPlayerInventoryClick(@NotNull InventoryClickEvent e) {
-        if(clickActions.getOnPlayerInventoryClick() == null) {
+        if(actions.getOnPlayerInventoryClick() == null) {
             e.setCancelled(!gui.accessPlayerInventory);
         } else {
-            clickActions.getOnPlayerInventoryClick().accept(e);
+            actions.getOnPlayerInventoryClick().accept(e);
         }
     }
 
@@ -139,6 +139,11 @@ public class CustomGUI implements GUI {
 
         Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
             if(!closed && inventory != p.getOpenInventory().getTopInventory()) {
+                if(actions.getOnClose() != null && !actions.getOnClose().apply(e)) {
+                    open();
+                    return;
+                }
+
                 clear();
             }
         }, 1);

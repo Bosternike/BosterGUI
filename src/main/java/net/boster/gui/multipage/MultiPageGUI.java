@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.boster.gui.BosterGUI;
 import net.boster.gui.GUI;
-import net.boster.gui.InventoryClickActions;
+import net.boster.gui.InventoryActions;
 import net.boster.gui.InventoryCreator;
 import net.boster.gui.button.GUIButton;
 import net.boster.gui.craft.CraftCustomGUI;
@@ -54,7 +54,7 @@ public class MultiPageGUI implements GUI {
     private BukkitTask closedTask;
     private boolean closed = false;
 
-    @NotNull private InventoryClickActions clickActions = new InventoryClickActions();
+    @NotNull private InventoryActions actions = new InventoryActions();
 
     public MultiPageGUI(@NotNull Player player) {
         this.player = player;
@@ -239,8 +239,8 @@ public class MultiPageGUI implements GUI {
 
     public void onClick(@NotNull InventoryClickEvent e) {
         if(e.getClickedInventory() == null) {
-            if(clickActions.getOutOfInventoryClick() != null) {
-                clickActions.getOutOfInventoryClick().accept(e);
+            if(actions.getOutOfInventoryClick() != null) {
+                actions.getOutOfInventoryClick().accept(e);
             }
             return;
         }
@@ -275,16 +275,21 @@ public class MultiPageGUI implements GUI {
     }
 
     public void onPlayerInventoryClick(@NotNull InventoryClickEvent e) {
-        if(clickActions.getOnPlayerInventoryClick() == null) {
+        if(actions.getOnPlayerInventoryClick() == null) {
             e.setCancelled(!accessPlayerInventory);
         } else {
-            clickActions.getOnPlayerInventoryClick().accept(e);
+            actions.getOnPlayerInventoryClick().accept(e);
         }
     }
 
     public void onClose(@NotNull InventoryCloseEvent e) {
         Bukkit.getScheduler().runTaskLater(BosterGUI.getProvider(), () -> {
             if(!closed && inventory != player.getOpenInventory().getTopInventory()) {
+                if(actions.getOnClose() != null && !actions.getOnClose().apply(e)) {
+                    open();
+                    return;
+                }
+
                 clear();
             }
         }, 1);
