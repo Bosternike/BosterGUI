@@ -1,9 +1,9 @@
 package net.boster.gui.constructor;
 
+import net.boster.gui.GUI;
 import net.boster.gui.InventoryCreator;
 import net.boster.gui.button.ClickableButton;
 import net.boster.gui.button.GUIButton;
-import net.boster.gui.button.SimpleButtonItem;
 import net.boster.gui.craft.CraftCustomGUI;
 import net.boster.gui.craft.CraftSizedGUI;
 import net.boster.gui.craft.CraftTypedGUI;
@@ -13,6 +13,7 @@ import net.boster.gui.utils.PlaceholdersProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -52,13 +53,6 @@ public class SimpleConstructor {
         craftGUI.setCreator(inventoryCreator);
     }
 
-    public void loadDefaultItems(@NotNull ConfigurationSection section) {
-        ConfigurationSection items = section.getConfigurationSection("Items");
-        if(items != null) {
-            loadItems(items, (PlaceholdersProvider) null);
-        }
-    }
-
     public <T extends GUIButton> void loadItems(@NotNull ConfigurationSection items, @NotNull Class<T> clazz) {
         loadItems(items, clazz, null);
     }
@@ -89,30 +83,8 @@ public class SimpleConstructor {
                         return slot;
                     }
 
-                    @Override
-                    public ItemStack prepareItem(@NotNull Player player) {
-                        return i.prepareItem(player);
-                    }
-                });
-            }
-        }
-    }
-
-    public void loadItems(@NotNull ConfigurationSection items, @Nullable PlaceholdersProvider replacer) {
-        for(String s : items.getKeys(false)) {
-            ConfigurationSection c = items.getConfigurationSection(s);
-            if(c == null) continue;
-
-            SimpleButtonItem i = new SimpleButtonItem(c);
-            if(replacer != null) {
-                i.setPlaceholdersProvider(p -> replacer);
-            }
-
-            for(Integer slot : ButtonUtils.getSlots(c)) {
-                craftGUI.addButton(new GUIButton() {
-                    @Override
-                    public int getSlot() {
-                        return slot;
+                    public void onClick(@NotNull GUI gui, @NotNull InventoryClickEvent event) {
+                        i.onClick(gui, event);
                     }
 
                     @Override
