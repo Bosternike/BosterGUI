@@ -3,7 +3,6 @@ package net.boster.gui.item;
 import net.boster.gui.item.durability.DurabilityProvider;
 import net.boster.gui.item.durability.NewDurabilityProvider;
 import net.boster.gui.item.durability.OldDurabilityProvider;
-import net.boster.gui.utils.Version;
 import net.boster.gui.item.creator.ItemCreator;
 import net.boster.gui.item.creator.NewItemCreator;
 import net.boster.gui.item.creator.OldItemCreator;
@@ -16,6 +15,7 @@ import net.boster.gui.item.owner.OwningPlayerProvider;
 import net.boster.gui.item.unbreakable.NewUnbreakableProvider;
 import net.boster.gui.item.unbreakable.OldUnbreakableProvider;
 import net.boster.gui.item.unbreakable.UnbreakableProvider;
+import net.boster.gui.utils.Version;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -30,34 +30,34 @@ public class ItemManagerImpl implements ItemManager {
     private final DurabilityProvider durabilityProvider;
 
     public ItemManagerImpl() {
-        if(Version.getCurrentVersion().getVersionInteger() < 9) {
-            this.creator = new OldItemCreator();
-        } else {
+        if(Version.v1_13_R2.isCurrentUpToDate()) {
             this.creator = new NewItemCreator();
+        } else {
+            this.creator = new OldItemCreator();
         }
 
-        if(Version.getCurrentVersion().getVersionInteger() < 10) {
-            this.customModelDataProvider = new OldCustomModelDataProvider();
-        } else {
+        if(Version.v1_14_R1.isCurrentUpToDate()) {
             this.customModelDataProvider = new NewCustomModelDataProvider();
+        } else {
+            this.customModelDataProvider = new OldCustomModelDataProvider();
         }
 
-        if(Version.getCurrentVersion().getVersionInteger() < 8) {
-            this.owningPlayerProvider = new OldOwningPlayerProvider();
-        } else {
+        if(Version.v1_12_R1.isCurrentUpToDate()) {
             this.owningPlayerProvider = new NewOwningPlayerProvider();
+        } else {
+            this.owningPlayerProvider = new OldOwningPlayerProvider();
         }
 
-        if(Version.getCurrentVersion().getVersionInteger() < 7) {
-            this.unbreakableProvider = new OldUnbreakableProvider();
-        } else {
+        if(Version.v1_11_R1.isCurrentUpToDate()) {
             this.unbreakableProvider = new NewUnbreakableProvider();
+        } else {
+            this.unbreakableProvider = new OldUnbreakableProvider();
         }
 
-        if(Version.getCurrentVersion().getVersionInteger() < 9) {
-            this.durabilityProvider = new OldDurabilityProvider();
-        } else {
+        if(Version.v1_13_R2.isCurrentUpToDate()) {
             this.durabilityProvider = new NewDurabilityProvider();
+        } else {
+            this.durabilityProvider = new OldDurabilityProvider();
         }
     }
 

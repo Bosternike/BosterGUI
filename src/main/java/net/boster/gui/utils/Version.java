@@ -1,37 +1,68 @@
 package net.boster.gui.utils;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
+@Getter
 public enum Version {
 
-    OLD_VERSION(0),
-    v1_8_R1(1),
-    v1_8_R2(2),
-    v1_8_R3(3),
-    v1_9_R1(4),
-    v1_9_R2(5),
-    v1_10_R1(6),
-    v1_11_R1(7),
-    v1_12_R1(8),
-    v1_13_R2(9),
-    v1_14_R1(10),
-    v1_15_R1(11),
-    v1_16_R1(12),
-    v1_16_R2(13),
-    v1_16_R3(14),
-    v1_17_R1(15),
-    v1_18_R1(16),
-    v1_18_R2(17),
-    v1_19_R1(18),
-    v1_19_R2(19),
-    NOT_FOUND(777);
+    OLD_VERSION(0, 0),
+    v1_8_R1,
+    v1_8_R2,
+    v1_8_R3,
+    v1_9_R1,
+    v1_9_R2,
+    v1_10_R1,
+    v1_11_R1,
+    v1_12_R1,
+    v1_13_R2,
+    v1_14_R1,
+    v1_15_R1,
+    v1_16_R1,
+    v1_16_R2,
+    v1_16_R3,
+    v1_17_R1,
+    v1_18_R1,
+    v1_18_R2,
+    v1_19_R1,
+    v1_19_R2,
+    v1_19_R3,
+    v1_19_R4,
+    v1_20_R1,
+    NOT_FOUND(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     private static Version currentVersion;
-    @Getter private final int versionInteger;
 
-    Version(int versionInteger) {
-        this.versionInteger = versionInteger;
+    private final int majorVersion;
+    private final int minorVersion;
+    private int patchVersion = -1;
+
+    Version() {
+        String[] version = name().replaceFirst("v", "").split("_");
+
+        majorVersion = Integer.parseInt(version[0]);
+        minorVersion = Integer.parseInt(version[1]);
+
+        if(version.length >= 3) {
+            patchVersion = Integer.parseInt(version[2]);
+        }
+    }
+
+    public boolean isUpToDate(int major, int minor, int patch) {
+        return major >= majorVersion && minor >= minorVersion && patch >= patchVersion;
+    }
+
+    public boolean isUpToDate(@NotNull Version version) {
+        return isUpToDate(version.majorVersion, version.minorVersion, version.patchVersion);
+    }
+
+    public boolean isCurrentUpToDate() {
+        return isUpToDate(getCurrentVersion());
     }
 
     public static Version getCurrentVersion() {
@@ -54,5 +85,10 @@ public enum Version {
             }
         }
         return currentVersion;
+    }
+
+    @NotNull
+    public static String getBukkitVersion() {
+        return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
     }
 }
