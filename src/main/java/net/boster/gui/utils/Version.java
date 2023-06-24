@@ -49,7 +49,7 @@ public enum Version {
         minorVersion = Integer.parseInt(version[1]);
 
         if(version.length >= 3) {
-            patchVersion = Integer.parseInt(version[2]);
+            patchVersion = Integer.parseInt(version[2].replace("R", ""));
         }
     }
 
