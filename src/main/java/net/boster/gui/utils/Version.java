@@ -34,7 +34,7 @@ public enum Version {
     v1_19_R3,
     v1_19_R4,
     v1_20_R1,
-    NOT_FOUND(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    NOT_FOUND(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     private static Version currentVersion;
 
